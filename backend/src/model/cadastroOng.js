@@ -30,18 +30,18 @@ const Ong = db.define('cadastroOng', {
   }
 });
 
+Ong.beforeCreate(async (ong) => {
+    ong.senha = await cripto.hash(ong.senha, 8);
+});
+
 Ong.sync();
 
 const TodosOng = () => Ong.findAll({
     where: { tipo_conta: 'ong' }
 });
 
-const addOng = async (params) => {
-    const senha_cripto = await cripto.hash(params.senha, 8);
-    params.senha = senha_cripto;
-    const resultado = await Ong.create(params);
-    return resultado;
-};
+const addOng = async (params) => 
+    await Ong.create(params);
 
 const buscar_nome = async (nome) => await Ong.findOne({
     where: { nome }
@@ -53,11 +53,13 @@ const atualizarOng = async(params) => {
         {
             senha: senha_cripto,
             email: params.email,
-            nome: params.nome
+            nome: params.nome,
+            categoria: params.categoria,
+            descricao: params.descricao
         },
         {
             where: {
-                nome: params.nome
+                id: params.id
             }
         }
     );
@@ -71,12 +73,10 @@ const deleteOng = async(id) => {
     });
 };
 
-const login = async(params) => {
-    return await Ong.findOne({
-        where: { email: params.email }
-    });
-};
+const login = async (email) => 
+    await Ong.findOne({ where: { email } });
 
-const validacao = (senha, senha_cripto) => cripto.compare(senha, senha_cripto);
+const validacao = (senha, hash) => 
+    cripto.compare(senha, hash);
 
 module.exports = { TodosOng, addOng, buscar_nome, deleteOng, atualizarOng, login, validacao, Ong };

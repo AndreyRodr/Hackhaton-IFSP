@@ -1,19 +1,20 @@
 const Sequelize = require("sequelize");
 
-const conn = new Sequelize ("Jacaridade", "root", "aluno123", {
-    host: "127.0.0.1",
-    dialect: "mysql",
+// No SQLite, passamos apenas as configurações de dialect e storage (caminho do arquivo)
+const conn = new Sequelize({
+    dialect: "sqlite",
+    storage: "./jacaridade.db", // O arquivo local do banco será criado aqui
     define: {
         timestamps: false
-  }
-})
+    }
+});
 
 conn.authenticate()
-.then(() => {
-    console.log("Banco conectado")
-})
-.catch(() => {
-    console.log("Banco não conectado")
-})
+    .then(() => {
+        console.log("Banco conectado");
+    })
+    .catch((erro) => {
+        console.log("Banco não conectado: " + erro);
+    });
 
 module.exports = conn;

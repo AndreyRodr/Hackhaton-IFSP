@@ -1,17 +1,13 @@
-const sql = require("mysql2")
+const sqlite3 = require("sqlite3").verbose();
 
-const mysql = sql.createConnection({
-    host: "127.0.0.1",
-    user: "root",
-    password: "aluno123",
-    database: "Jacaridade"
-});
-
-mysql.connect((erro) => {
+// O método Database já tenta fazer a conexão e cria o arquivo se ele não existir.
+// Passamos o caminho do arquivo e a função de callback para capturar erros.
+const db = new sqlite3.Database("./jacaridade.db", (erro) => {
     if (erro) {
-        console.log("Deu ruim " + erro)
+        console.log("Deu ruim " + erro.message);
+    } else {
+        console.log("Banco Conectado");
     }
-    else console.log("Banco Conectado")
 });
 
-module.exports = mysql;
+module.exports = db;

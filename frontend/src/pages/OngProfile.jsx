@@ -11,6 +11,8 @@ export default function OngProfile() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState('');
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteUpdating, setFavoriteUpdating] = useState(false);
 
     // Estados para edição
     const [isEditing, setIsEditing] = useState(false);
@@ -19,13 +21,13 @@ export default function OngProfile() {
     useEffect(() => {
         // Pega o usuário logado no navegador
         const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setCurrentUser(JSON.parse(storedUser));
+        const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+        if (parsedUser) {
+            setCurrentUser(parsedUser);
         }
 
         const fetchOngData = async () => {
             try {
-                // Tenta buscar da API real
                 const resOng = await axios.get(`http://localhost:3000/api/ongs/${id}`);
                 setOng(resOng.data.ong);
                 setFormData({
@@ -33,8 +35,13 @@ export default function OngProfile() {
                     categoria: resOng.data.ong.categoria,
                     descricao: resOng.data.ong.descricao
                 });
+
+                if (parsedUser && parsedUser.tipo !== 'ong') {
+                    const resUser = await axios.get(`http://localhost:3000/api/users/${parsedUser.id}`);
+                    const favoriteList = resUser.data.user?.favorites || [];
+                    setIsFavorite(favoriteList.some((favorite) => favorite.id === Number(id)));
+                }
             } catch (error) {
-                // PLANO B (MOCK): Se a API falhar (porque ainda não existe), carrega dados falsos para a tela não quebrar no Hackathon!
                 console.warn("API não encontrada, usando dados simulados.");
                 const mockOng = {
                     id: Number(id),
@@ -46,7 +53,6 @@ export default function OngProfile() {
                 setOng(mockOng);
                 setFormData({ nome: mockOng.nome, categoria: mockOng.categoria, descricao: mockOng.descricao });
             } finally {
-                // Posts simulados
                 setPosts([
                     { id: 1, titulo: 'Campanha do Agasalho', conteudo: 'Estamos arrecadando cobertores neste inverno.', data: '10/05/2026' },
                     { id: 2, titulo: 'Adoção de Pets', conteudo: 'Neste sábado teremos feira de adoção na praça central.', data: '12/05/2026' }

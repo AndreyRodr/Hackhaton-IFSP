@@ -5,6 +5,7 @@ import axios from 'axios';
 export default function PaginaUser() {
     const { id } = useParams();
     const [user, setUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
     const [supportedOngs, setSupportedOngs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState('');
@@ -12,7 +13,19 @@ export default function PaginaUser() {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({ nome: '', interesses: '' });
 
+    const isOwner = currentUser?.id === Number(id);
+
     useEffect(() => {
+        const stored = localStorage.getItem('user');
+        if (stored) {
+            try {
+                setCurrentUser(JSON.parse(stored));
+            } catch (error) {
+                console.error('Erro ao processar user salvo:', error);
+                localStorage.removeItem('user');
+            }
+        }
+
         const fetchUserData = async () => {
             try {
                 const resUser = await axios.get(`http://localhost:3000/api/users/${id}`);
@@ -89,11 +102,6 @@ export default function PaginaUser() {
                                         ))}
                                     </div>
 
-                                    <div className="mt-4 d-grid">
-                                        <button className="btn btn-outline-success btn-sm" onClick={() => setIsEditing(true)}>
-                                            ✏️ Editar Perfil
-                                        </button>
-                                    </div>
                                     {isOwner && (
                                         <div className="mt-4 d-grid">
                                             <button className="btn btn-outline-success btn-sm" onClick={() => setIsEditing(true)}>

@@ -1,11 +1,37 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function Feed() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const [ongs, setOngs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [feedErro, setFeedErro] = useState('');
 
-    // Mock de dados: Simula as ONGs cadastradas no banco
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        } else {
+            navigate('/login');
+            return;
+        }
+
+        const fetchOngs = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/api/ongs');
+                setOngs(response.data.ongs || []);
+            } catch (error) {
+                setFeedErro('Não foi possível carregar as ONGs do feed.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOngs();
+    }, [navigate]);
+
     const ongsMock = [
         {
             id: 1,
@@ -30,17 +56,8 @@ export default function Feed() {
         }
     ];
 
-    useEffect(() => {
-        // Verifica se o usuário está logado para poder ver o feed
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        } else {
-            navigate('/login');
-        }
-    }, [navigate]);
-
     if (!user) return <div className="text-center mt-5">Carregando...</div>;
+    if (loading) return <div className="text-center mt-5">Carregando feed...</div>;
 
     return (
         <div style={{ backgroundColor: '#f4f4f9', minHeight: '100vh', paddingBottom: '50px' }}>
@@ -64,15 +81,18 @@ export default function Feed() {
                 </div>
 
                 {/* Grid de ONGs */}
+                {feedErro && (
+                    <div className="alert alert-warning text-center">{feedErro}</div>
+                )}
                 <div className="row g-4">
-                    {ongsMock.map((ong) => (
+                    {(ongs.length ? ongs : ongsMock).map((ong) => (
                         <div className="col-12 col-md-6 col-lg-4" key={ong.id}>
                             <div className="card h-100 shadow-sm border-0" style={{ borderRadius: '15px', overflow: 'hidden' }}>
-                                <img src={ong.imagem} className="card-img-top" alt={ong.nome} style={{ height: '200px', objectFit: 'cover' }} />
+                                <img src={ong.imagem || 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=500'} className="card-img-top" alt={ong.nome} style={{ height: '200px', objectFit: 'cover' }} />
                                 <div className="card-body d-flex flex-column">
-                                    <span className="badge bg-success mb-2 align-self-start">{ong.categoria}</span>
+                                    <span className="badge bg-success mb-2 align-self-start">{ong.categoria || 'ONG'}</span>
                                     <h5 className="card-title fw-bold text-dark">{ong.nome}</h5>
-                                    <p className="card-text text-muted" style={{ fontSize: '0.9rem' }}>{ong.descricao}</p>
+                                    <p className="card-text text-muted" style={{ fontSize: '0.9rem' }}>{ong.descricao || 'Instituição cadastrada recentemente.'}</p>
                                     
                                     {/* Botão alinhado sempre ao final do card */}
                                     <div className="mt-auto pt-3">

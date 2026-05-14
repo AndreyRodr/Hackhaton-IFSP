@@ -19,7 +19,7 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/cadastro-ong" element={<CadastroOng />} />
         <Route path="/ong/:id" element={<OngProfile />} />
-        <Route path="/user/:id" element={<PaginaUser />} />
+        <Route path="/user/" element={<PaginaUser />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/home" element={<Home />} />
       </Routes>

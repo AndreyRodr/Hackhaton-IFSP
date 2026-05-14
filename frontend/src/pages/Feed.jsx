@@ -50,7 +50,7 @@ export default function Feed() {
                     <span className="navbar-brand mb-0 h1 fw-bold">Jacaridade</span>
                     <div className="d-flex align-items-center">
                         <span className="text-white me-3 d-none d-md-block">Olá, {user.nome}</span>
-                        <Link to="/user/:id" className="btn btn-outline-light btn-sm me-2">Meu Perfil</Link>
+                        <Link to="/user/" className="btn btn-outline-light btn-sm me-2">Meu Perfil</Link>
                         <button onClick={() => { localStorage.removeItem('user'); navigate('/'); }} className="btn btn-light btn-sm text-success fw-bold">Sair</button>
                     </div>
                 </div>

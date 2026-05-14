@@ -21,7 +21,7 @@ app.post('/api/login', async (req, res) => {
         if (!user || !(await validarSenha(senha, user.senha))) {
             return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
         }
-        res.json({ message: 'Login efetuado com sucesso', user: { nome: user.nome, tipo: 'user' } });
+        res.json({ message: 'Login efetuado com sucesso', user: { nome: user.nome, tipo: 'user', email: email, id: user.id } });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao processar login.' });
     }

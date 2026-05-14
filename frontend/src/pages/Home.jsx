@@ -50,6 +50,7 @@ export default function Home() {
                     </div>
 
                     <div className="d-grid gap-2 mt-3">
+                        <button onClick={() => navigate('/perfis')} className="btn btn-secondary">Meu Perfil</button> //add um botão para o perfil
                         <button onClick={handleLogout} className="btn btn-outline-danger">Sair do Sistema</button>
                     </div>
                 </div>

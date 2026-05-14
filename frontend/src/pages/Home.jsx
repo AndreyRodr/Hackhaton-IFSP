@@ -45,7 +45,7 @@ export default function Home() {
                             Bem-vindo(a), <strong>{user.nome}</strong>!
                         </p>
                         <span className={`badge ${user.tipo === 'ong' ? 'bg-secondary' : 'bg-primary'} p-2`} style={{ fontSize: '1rem' }}>
-                            Acesso: {user.tipo === 'ong' ? 'Instituição (ONG)' : 'Doador/Voluntário'}
+                            Acesso: {user.tipo === 'ong' ? 'Instituição (ONG)' : 'Doador'}
                         </span>
                     </div>
 

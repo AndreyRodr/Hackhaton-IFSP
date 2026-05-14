@@ -59,16 +59,16 @@ const atualizarOng = async(params) => {
         },
         {
             where: {
-                id: params.id
+                nome: params.nome
             }
         }
     );
 };
 
-const deleteOng = async(id) => {
+const deleteOng = async(nome) => {
     await Ong.destroy({
         where: {
-            id
+            nome: nome
         }
     });
 };
@@ -76,7 +76,7 @@ const deleteOng = async(id) => {
 const login = async (email) => 
     await Ong.findOne({ where: { email } });
 
-const validacao = (senha, hash) => 
+const valnomeacao = (senha, hash) => 
     cripto.compare(senha, hash);
 
-module.exports = { TodosOng, addOng, buscar_nome, deleteOng, atualizarOng, login, validacao, Ong };
+module.exports = { TodosOng, addOng, buscar_nome, deleteOng, atualizarOng, login, valnomeacao, Ong };

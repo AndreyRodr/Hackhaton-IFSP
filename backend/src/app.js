@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { addUser, loginUser, validarSenha } = require('./model/cadastroUser');
-const { addOng, login: loginOng, validacao: validarSenhaOng } = require('./model/cadastroOng');
+const { addOng, login: loginOng, valnomeacao: validarSenhaOng } = require('./model/cadastroOng');
 
 const app = express();
 
@@ -31,7 +31,7 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/login-ong', async (req, res) => {
     const { email, senha } = req.body;
     try {
-        const ong = await loginOng({ email });
+        const ong = await loginOng(email);
         if (!ong || !(await validarSenhaOng(senha, ong.senha))) {
             return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
         }

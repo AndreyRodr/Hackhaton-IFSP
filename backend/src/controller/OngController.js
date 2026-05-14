@@ -22,7 +22,6 @@ class OngController {
             if (ong && await validarSenhaOng(senha, ong.senha)) {
                 // Salva a ONG na sessão
                 req.session.user = {
-                    id: ong.id,
                     nome: ong.nome,
                     email: ong.email,
                     tipo: 'ong'
@@ -69,7 +68,7 @@ class OngController {
             if (error.name === 'SequelizeUniqueConstraintError') {
                 req.flash('error', 'Este e-mail já está cadastrado.');
             } else {
-                req.flash('error', 'Erro ao cadastrar ONG. Tente novamente.');
+                req.flash('error', 'Erro ao cadastrar ONG. Tente novamente.' + error.name);
             }
             res.redirect('/cadastro-ong');
         }

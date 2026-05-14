@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const { addUser, loginUser, validarSenha } = require('./model/cadastroUser');
-const { addOng, login: loginOng, valnomeacao: validarSenhaOng } = require('./model/cadastroOng');
+const { addUser, loginUser, validarSenha, User } = require('./model/cadastroUser');
+const { addOng, login: loginOng, valnomeacao: validarSenhaOng, Ong } = require('./model/cadastroOng');
 
 const app = express();
 
@@ -35,9 +35,61 @@ app.post('/api/login-ong', async (req, res) => {
         if (!ong || !(await validarSenhaOng(senha, ong.senha))) {
             return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
         }
-        res.json({ message: 'Login efetuado com sucesso', user: { nome: ong.nome, tipo: 'ong' } });
+        res.json({ message: 'Login efetuado com sucesso', user: { id: ong.id, nome: ong.nome, email: ong.email, tipo: 'ong' } });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao processar login da ONG.' });
+    }
+});
+
+// Rota para obter perfil de usuário pelo ID
+app.get('/api/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id, {
+            attributes: ['id', 'nome', 'email', 'tipo_conta', 'interesses']
+        });
+        if (!user) return res.status(404).json({ error: 'Usuário não encontrado.' });
+        res.json({ user: { id: user.id, nome: user.nome, email: user.email, tipo: user.tipo_conta, interesses: user.interesses } });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao buscar usuário.' });
+    }
+});
+
+// Rota para obter perfil de ONG pelo ID
+app.get('/api/ongs/:id', async (req, res) => {
+    try {
+        const ong = await Ong.findByPk(req.params.id, {
+            attributes: ['id', 'nome', 'email', 'categoria', 'descricao', 'tipo_conta']
+        });
+        if (!ong) return res.status(404).json({ error: 'ONG não encontrada.' });
+        res.json({ ong: { id: ong.id, nome: ong.nome, email: ong.email, categoria: ong.categoria, descricao: ong.descricao, tipo: ong.tipo_conta } });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao buscar ONG.' });
+    }
+});
+
+// Atualizar perfil de usuário pelo ID
+app.put('/api/users/:id', async (req, res) => {
+    const { nome, interesses, email } = req.body;
+    try {
+        const [updated] = await User.update({ nome, interesses, email }, { where: { id: req.params.id } });
+        if (!updated) return res.status(404).json({ error: 'Usuário não encontrado.' });
+        const user = await User.findByPk(req.params.id, { attributes: ['id', 'nome', 'email', 'tipo_conta', 'interesses'] });
+        res.json({ user });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao atualizar usuário.' });
+    }
+});
+
+// Atualizar perfil de ONG pelo ID
+app.put('/api/ongs/:id', async (req, res) => {
+    const { nome, categoria, descricao, email } = req.body;
+    try {
+        const [updated] = await Ong.update({ nome, categoria, descricao, email }, { where: { id: req.params.id } });
+        if (!updated) return res.status(404).json({ error: 'ONG não encontrada.' });
+        const ong = await Ong.findByPk(req.params.id, { attributes: ['id', 'nome', 'email', 'categoria', 'descricao', 'tipo_conta'] });
+        res.json({ ong });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao atualizar ONG.' });
     }
 });
 

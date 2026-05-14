@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import PaginaUser from './pages/PaginaUser';
 import OngProfile from './pages/OngProfile';
 import Feed from './pages/Feed';
+import Perfis from './pages/perfis';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/cadastro-ong" element={<CadastroOng />} />
         <Route path="/ong/:id" element={<OngProfile />} />
         <Route path="/user/:id" element={<PaginaUser />} />
+        <Route path="/perfis" element={<Perfis />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/home" element={<Home />} />
       </Routes>

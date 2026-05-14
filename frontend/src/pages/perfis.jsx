@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../styles/login.css';
 
 export default function Perfis() {
-    const [user] = useState(() => {
-        const storedUser = localStorage.getItem('user'); //localStorage como se fosse um session
-        if (storedUser) {
+    const [storedUser] = useState(() => {
+        const saved = localStorage.getItem('user');
+        if (saved) {
             try {
-                return JSON.parse(storedUser);
+                return JSON.parse(saved);
             } catch (error) {
                 console.error('Erro ao processar dados do usuário:', error);
                 localStorage.removeItem('user');
@@ -16,22 +17,40 @@ export default function Perfis() {
         return null;
     });
 
-    const navigate = useNavigate(); //função para redirecionar
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [erro, setErro] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
-        if (!user) {
+        if (!storedUser) {
             navigate('/login');
+            return;
         }
-    }, [user, navigate]);
 
-    const handleLogout = () => { //se sair ele apaga a session
+        const fetchProfile = async () => {
+            try {
+                const path = storedUser.tipo === 'ong' ? `/api/ongs/${storedUser.id}` : `/api/users/${storedUser.id}`;
+                const response = await axios.get(`http://localhost:3000${path}`);
+                setProfile(response.data.user || response.data.ong);
+            } catch (error) {
+                setErro('Não foi possível carregar os dados do perfil.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, [storedUser, navigate]);
+
+    const handleLogout = () => {
         localStorage.removeItem('user');
         navigate('/');
     };
 
-    if (!user) {
-        return <div className="text-center mt-5">Carregando perfil...</div>;
-    }
+    if (loading) return <div className="text-center mt-5">Carregando perfil...</div>;
+    if (erro) return <div className="container mt-5 alert alert-danger">{erro}</div>;
+    if (!profile) return <div className="container mt-5 alert alert-warning">Perfil não encontrado.</div>;
 
     return (
         <div className="container d-flex justify-content-center mt-5">
@@ -39,12 +58,12 @@ export default function Perfis() {
                 <div className="card p-4">
                     <h2 className="text-center mb-4">Meu Perfil</h2>
                     <div className="mb-3">
-                        <p><strong>Nome:</strong> {user.nome}</p>
-                        <p><strong>Tipo de acesso:</strong> {user.tipo === 'ong' ? 'ONG' : 'Usuário'}</p>
-                        {user.email && <p><strong>E-mail:</strong> {user.email}</p>}
-                        {user.categoria && <p><strong>Categoria:</strong> {user.categoria}</p>}
-                        {user.descricao && <p><strong>Descrição:</strong> {user.descricao}</p>}
-                        {user.interesses && <p><strong>Interesses:</strong> {user.interesses}</p>}
+                        <p><strong>Nome:</strong> {profile.nome}</p>
+                        <p><strong>E-mail:</strong> {profile.email}</p>
+                        <p><strong>Tipo de conta:</strong> {storedUser.tipo === 'ong' ? 'ONG' : 'Usuário'}</p>
+                        {storedUser.tipo === 'ong' && profile.categoria && <p><strong>Categoria:</strong> {profile.categoria}</p>}
+                        {storedUser.tipo === 'ong' && profile.descricao && <p><strong>Descrição:</strong> {profile.descricao}</p>}
+                        {storedUser.tipo !== 'ong' && profile.interesses && <p><strong>Interesses:</strong> {profile.interesses}</p>}
                     </div>
 
                     <div className="d-grid gap-2">

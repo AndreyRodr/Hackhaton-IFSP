@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-export default function PaginaUser({ currentUser }) {
+export default function PaginaUser() {
     const { id } = useParams();
     const [user, setUser] = useState(null);
     const [supportedOngs, setSupportedOngs] = useState([]);
@@ -12,30 +12,17 @@ export default function PaginaUser({ currentUser }) {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({ nome: '', interesses: '' });
 
-    // Verifica se o usuário logado é o dono do perfil
-    const isOwner = currentUser?.id === Number(id); 
-
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                // Busca os dados reais do usuário do backend
                 const resUser = await axios.get(`http://localhost:3000/api/users/${id}`);
-                const userData = resUser.data;
+                const userData = resUser.data.user;
                 setUser(userData);
                 setFormData({
                     nome: userData.nome || '',
                     interesses: userData.interesses || ''
                 });
-
-                // Busca ONGs que o usuário apoia 
-                try {
-                    const resOngs = await axios.get(`http://localhost:3000/api/users/${id}/ongs`);
-                    setSupportedOngs(resOngs.data);
-                } catch (err) {
-                    console.log('Nenhuma ONG apoiada encontrada ou erro na rota.');
-                    setSupportedOngs([]);
-                }
-
+                setSupportedOngs([]);
             } catch (error) {
                 setErro('Erro ao carregar os dados do usuário.');
             } finally {
@@ -49,10 +36,8 @@ export default function PaginaUser({ currentUser }) {
     const handleSave = async (e) => {
         e.preventDefault();
         try {
-            // Rota para atualizar os dados do usuário no backend
-            await axios.put(`http://localhost:3000/api/users/${id}`, formData);
-            
-            setUser({ ...user, ...formData });
+            const response = await axios.put(`http://localhost:3000/api/users/${id}`, formData);
+            setUser(response.data.user);
             setIsEditing(false);
         } catch (error) {
             setErro('Erro ao salvar as alterações.');
@@ -97,14 +82,18 @@ export default function PaginaUser({ currentUser }) {
                                     <hr />
                                     <h6 className="text-muted mb-2">Meus Interesses</h6>
                                     <div className="mb-3">
-                                        {user.interesses.split(',').map((interesse, index) => (
+                                        {(user.interesses || '').split(',').filter(Boolean).map((interesse, index) => (
                                             <span key={index} className="badge bg-light text-dark border me-1 mb-1">
                                                 {interesse.trim()}
                                             </span>
                                         ))}
                                     </div>
 
-                                    {/* Botão de Edição (Apenas para o Dono) */}
+                                    <div className="mt-4 d-grid">
+                                        <button className="btn btn-outline-success btn-sm" onClick={() => setIsEditing(true)}>
+                                            ✏️ Editar Perfil
+                                        </button>
+                                    </div>
                                     {isOwner && (
                                         <div className="mt-4 d-grid">
                                             <button className="btn btn-outline-success btn-sm" onClick={() => setIsEditing(true)}>

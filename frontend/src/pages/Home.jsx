@@ -52,7 +52,7 @@ export default function Home() {
                     <button onClick={() => navigate('/feed')} className="btn btn-success btn-lg fw-bold mb-3">Explorar ONGs e Doar</button>
 
                     <div className="d-grid gap-2 mt-3">
-                        <button onClick={() => navigate('/perfis')} className="btn btn-secondary">Meu Perfil</button> //add um botão para o perfil
+                        <button onClick={() => navigate('/perfis')} className="btn btn-secondary">Meu Perfil</button>
                         <button onClick={handleLogout} className="btn btn-outline-danger">Sair do Sistema</button>
                     </div>
                 </div>

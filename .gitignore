@@ -34,3 +34,4 @@ Thumbs.db
 
 # Cobertura de Testes
 coverage/
+backend/jacaridade.db

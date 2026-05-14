@@ -17,6 +17,7 @@ class OngController {
         const { email, senha } = req.body;
         try {
             const ong = await loginOng(email);
+            console.log(ong);
             
             // Verifica se a ONG existe e se a senha bate
             if (ong && await validarSenhaOng(senha, ong.senha)) {

@@ -32,11 +32,15 @@ app.post('/api/login-ong', async (req, res) => {
     const { email, senha } = req.body;
     try {
         const ong = await loginOng({ email });
+        console.log(ong);
+        
         if (!ong || !(await validarSenhaOng(senha, ong.senha))) {
             return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
         }
         res.json({ message: 'Login efetuado com sucesso', user: { nome: ong.nome, tipo: 'ong' } });
     } catch (error) {
+        console.log(error);
+        
         res.status(500).json({ error: 'Erro ao processar login da ONG.' });
     }
 });

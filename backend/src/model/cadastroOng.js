@@ -73,7 +73,7 @@ const deleteOng = async(id) => {
     });
 };
 
-const login = async (email) => 
+const login = async ({email}) => 
     await Ong.findOne({ where: { email } });
 
 const validacao = (senha, hash) => 

@@ -49,6 +49,8 @@ export default function Home() {
                         </span>
                     </div>
 
+                    <button onClick={() => navigate('/feed')} className="btn btn-success btn-lg fw-bold mb-3">Explorar ONGs e Doar</button>
+
                     <div className="d-grid gap-2 mt-3">
                         <button onClick={handleLogout} className="btn btn-outline-danger">Sair do Sistema</button>
                     </div>

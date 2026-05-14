@@ -21,6 +21,7 @@ function App() {
         <Route path="/ong/:id" element={<OngProfile />} />
         <Route path="/user/:id" element={<PaginaUser />} />
         <Route path="/feed" element={<Feed />} />
+        <Route path="/home" element={<Home />} />
       </Routes>
     </Router>
   );

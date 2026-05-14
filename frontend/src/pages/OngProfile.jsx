@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function OngProfile() {
-    const { id } = useParams(); // Pega o ID da URL
+    const { id } = useParams();
     const navigate = useNavigate();
     
     const [currentUser, setCurrentUser] = useState(null);
@@ -16,8 +16,16 @@ export default function OngProfile() {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({ nome: '', categoria: '', descricao: '' });
 
+    // ESTADOS PARA O MODAL
+    const [showModal, setShowModal] = useState(false);
+    const [modalConfig, setModalConfig] = useState({ title: '', message: '' });
+
+    const openModal = (title, message) => {
+        setModalConfig({ title, message });
+        setShowModal(true);
+    };
+
     useEffect(() => {
-        // Pega o usuário logado no navegador
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             setCurrentUser(JSON.parse(storedUser));
@@ -25,7 +33,6 @@ export default function OngProfile() {
 
         const fetchOngData = async () => {
             try {
-                // Tenta buscar da API real
                 const resOng = await axios.get(`http://localhost:3000/api/ongs/${id}`);
                 setOng(resOng.data.ong);
                 setFormData({
@@ -34,7 +41,6 @@ export default function OngProfile() {
                     descricao: resOng.data.ong.descricao
                 });
             } catch (error) {
-                // PLANO B (MOCK): Se a API falhar (porque ainda não existe), carrega dados falsos para a tela não quebrar no Hackathon!
                 console.warn("API não encontrada, usando dados simulados.");
                 const mockOng = {
                     id: Number(id),
@@ -46,7 +52,6 @@ export default function OngProfile() {
                 setOng(mockOng);
                 setFormData({ nome: mockOng.nome, categoria: mockOng.categoria, descricao: mockOng.descricao });
             } finally {
-                // Posts simulados
                 setPosts([
                     { id: 1, titulo: 'Campanha do Agasalho', conteudo: 'Estamos arrecadando cobertores neste inverno.', data: '10/05/2026' },
                     { id: 2, titulo: 'Adoção de Pets', conteudo: 'Neste sábado teremos feira de adoção na praça central.', data: '12/05/2026' }
@@ -58,7 +63,6 @@ export default function OngProfile() {
         fetchOngData();
     }, [id]);
 
-    // Verifica se o usuário logado é a própria ONG desta página
     const isOwner = currentUser?.tipo === 'ong' && currentUser?.id === Number(id);
 
     const handleSave = async (e) => {
@@ -67,11 +71,12 @@ export default function OngProfile() {
             await axios.put(`http://localhost:3000/api/ongs/${id}`, formData, { withCredentials: true });
             setOng({ ...ong, ...formData });
             setIsEditing(false);
+            openModal("Sucesso", "Perfil atualizado com sucesso!");
         } catch (error) {
-            // Finge que salvou para o visual funcionar no hackathon
             setOng({ ...ong, ...formData });
             setIsEditing(false);
-            alert("Como a API não existe, salvamos apenas visualmente!");
+            // Substituído alert pelo Modal
+            openModal("Informação", "Como a API não existe, salvamos apenas visualmente!");
         }
     };
 
@@ -81,7 +86,30 @@ export default function OngProfile() {
 
     return (
         <div style={{ backgroundColor: '#f4f4f9', minHeight: '100vh', paddingBottom: '50px' }}>
-            {/* Navbar simples */}
+            
+            {/* COMPONENTE MODAL (Renderização condicional) */}
+            {showModal && (
+                <>
+                    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content" style={{ borderRadius: '15px', border: 'none' }}>
+                                <div className="modal-header border-0">
+                                    <h5 className="modal-title fw-bold text-success">{modalConfig.title}</h5>
+                                    <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                                </div>
+                                <div className="modal-body">
+                                    <p>{modalConfig.message}</p>
+                                </div>
+                                <div className="modal-footer border-0">
+                                    <button type="button" className="btn btn-success" onClick={() => setShowModal(false)} style={{ borderRadius: '8px' }}>Entendido</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show"></div>
+                </>
+            )}
+
             <nav className="navbar navbar-expand-lg navbar-dark bg-success mb-4 shadow-sm">
                 <div className="container">
                     <span className="navbar-brand mb-0 h1 fw-bold">Jacaridade</span>
@@ -91,7 +119,6 @@ export default function OngProfile() {
 
             <div className="container">
                 <div className="row">
-                    {/* COLUNA ESQUERDA: INFORMAÇÕES DA ONG */}
                     <div className="col-md-4 mb-4">
                         <div className="card shadow-sm border-0" style={{ borderRadius: '15px' }}>
                             <div className="card-body">
@@ -129,7 +156,6 @@ export default function OngProfile() {
                                         <h6 className="text-muted mt-4 mb-2 fw-bold">Contato</h6>
                                         <p className="card-text small mb-0">📧 {ong.email}</p>
 
-                                        {/* Botão de Edição (Apenas para o Dono) */}
                                         {isOwner && (
                                             <div className="mt-4 d-grid">
                                                 <button className="btn btn-outline-success btn-sm fw-bold" onClick={() => setIsEditing(true)}>
@@ -138,10 +164,9 @@ export default function OngProfile() {
                                             </div>
                                         )}
                                         
-                                        {/* Botão de Doar (Para usuários normais) */}
                                         {!isOwner && (
                                             <div className="mt-4 d-grid">
-                                                <button className="btn btn-success fw-bold" onClick={() => alert("Chave PIX: celular da ong (12) 9999-9999")}>
+                                                <button className="btn btn-success fw-bold" onClick={() => openModal("Doação", "Chave PIX: celular da ong (12) 9999-9999")}>
                                                     Fazer uma Doação 💚
                                                 </button>
                                             </div>
@@ -152,7 +177,6 @@ export default function OngProfile() {
                         </div>
                     </div>
 
-                    {/* COLUNA DIREITA: POSTAGENS DA ONG */}
                     <div className="col-md-8">
                         <div className="d-flex justify-content-between align-items-center mb-4">
                             <h3 className="mb-0 fw-bold" style={{ color: '#2c3e50' }}>Atualizações da ONG</h3>

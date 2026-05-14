@@ -5,7 +5,9 @@ import LoginOng from './pages/LoginOng';
 import Cadastro from './pages/Cadastro';
 import CadastroOng from './pages/CadastroOng';
 import Home from './pages/Home';
-import Perfis from './pages/perfis'; //rotas
+import PaginaUser from './pages/PaginaUser';
+import OngProfile from './pages/OngProfile';
+import Feed from './pages/Feed';
 
 function App() {
   return (
@@ -16,8 +18,10 @@ function App() {
         <Route path="/login-ong" element={<LoginOng />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/cadastro-ong" element={<CadastroOng />} />
+        <Route path="/ong/:id" element={<OngProfile />} />
+        <Route path="/user/:id" element={<PaginaUser />} />
+        <Route path="/feed" element={<Feed />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/perfis" element={<Perfis />} /> {/* Rota para a página de perfis */}
       </Routes>
     </Router>
   );

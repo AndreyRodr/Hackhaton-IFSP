@@ -1,0 +1,13 @@
+{
+  "name": "hackathon-ada-lovelace",
+  "version": "1.0.0",
+  "scripts": {
+    "server": "npm start --prefix backend",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently --shell \"C:\\Windows\\System32\\cmd.exe\" \"npm run server\" \"npm run client\""
+
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

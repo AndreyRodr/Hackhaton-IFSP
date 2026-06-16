@@ -6,7 +6,7 @@ const { addOng, login: loginOng, validacao: validarSenhaOng } = require('./model
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:5173', // Porta padrão do Vite
+    origin: 'http://localhost:3000', // Porta padrão do Vite
     credentials: true
 }));
 
